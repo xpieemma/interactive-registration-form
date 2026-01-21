@@ -27,7 +27,7 @@ const validateInput = (input, errorId) => {
   // Confirm password check
   if (input.id === "confirmPassword") {
     input.setCustomValidity(
-      input.value !== passwordInput.value ? "Passwords do not match." : ""
+      input.value !== passwordInput.value ? "Passwords do not match." : "",
     );
   }
 
@@ -72,8 +72,12 @@ const validateInput = (input, errorId) => {
     input.addEventListener("input", () => {
       validateInput(input, `${input.id}Error`);
     });
-  }
+  },
 );
+
+passwordInput.addEventListener("input", () => {
+validateInput(confirmPasswordInput, "confirmPasswordError");
+});
 
 // handle form submission
 form.addEventListener("submit", (e) => {
@@ -84,14 +88,12 @@ form.addEventListener("submit", (e) => {
   //re validate before submission
   [usernameInput, emailInput, passwordInput, confirmPasswordInput].forEach(
     (input) => {
-      input.addEventListener("input", () => {
         validateInput(input, `${input.id}Error`);
         if (!input.validity.valid) {
           isFormValid = false;
         }
       });
-    }
-  );
+  
 
   if (isFormValid) {
     localStorage.setItem("registeredUsername", usernameInput.value);
