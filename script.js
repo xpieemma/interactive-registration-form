@@ -4,6 +4,7 @@ const usernameInput = document.getElementById("username");
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const confirmPasswordInput = document.getElementById("confirmPassword");
+const formStatus = document.getElementById("formStatus");
 
 //retrieves previously saved username from the browser
 //No need for event listener since script at the end of body
@@ -12,6 +13,8 @@ const savedUsername = localStorage.getItem("registeredUsername");
 if (savedUsername) {
   usernameInput.value = savedUsername;
 }
+
+
 
 // validation function
 const validateInput = (input, errorId) => {
@@ -23,6 +26,8 @@ const validateInput = (input, errorId) => {
   //       input.setCustomValidity("");
   //     }
   //   }
+
+
 
   // Confirm password check
   if (input.id === "confirmPassword") {
@@ -70,14 +75,17 @@ const validateInput = (input, errorId) => {
 [usernameInput, emailInput, passwordInput, confirmPasswordInput].forEach(
   (input) => {
     input.addEventListener("input", () => {
+     
+      formStatus.textContent = "";
+      formStatus.className = "";
       validateInput(input, `${input.id}Error`);
-    });
-  },
-);
 
-passwordInput.addEventListener("input", () => {
-validateInput(confirmPasswordInput, "confirmPasswordError");
-});
+      if (input === passwordInput && confirmPasswordInput.value !== "") {
+        validateInput(confirmPasswordInput, "confirmPasswordError");
+      }
+    });
+  }
+);
 
 // handle form submission
 form.addEventListener("submit", (e) => {
@@ -88,18 +96,36 @@ form.addEventListener("submit", (e) => {
   //re validate before submission
   [usernameInput, emailInput, passwordInput, confirmPasswordInput].forEach(
     (input) => {
-        validateInput(input, `${input.id}Error`);
-        if (!input.validity.valid) {
-          isFormValid = false;
-        }
-      });
-  
+      validateInput(input, `${input.id}Error`);
+      if (!input.validity.valid) {
+        isFormValid = false;
+      }
+    },
+  );
 
   if (isFormValid) {
     localStorage.setItem("registeredUsername", usernameInput.value);
+
+    formStatus.textContent = "Registration successful";
+    formStatus.className = "success";
+
     alert("Registration Successful!");
     form.reset();
+
+    [usernameInput, emailInput, passwordInput, confirmPasswordInput].forEach(
+      (input) => {
+        input.setCustomValidity("");
+        document.getElementById(`${input.id}Error`).textContent = "";
+      },
+    );
+
   } else {
-    form.querySelector(":invalid").focus();
+    formStatus.textContent = "Please fix the errors above.";
+    formStatus.className = "error";
+    
+    const firstInvalid = form.querySelector(":invalid");
+    if (firstInvalid) {
+        firstInvalid.focus();
+    }
   }
 });
